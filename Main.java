@@ -1,49 +1,47 @@
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
+import javax.swing.*;
+import java.awt.*;
 
-public class FloodFillFila {
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ManipuladorImagem manipulador = new ManipuladorImagem();
+        BufferedImage imagemOriginal = manipulador.carregar("entrada.png");
 
-    private ManipuladorImagem manipulador;
+        // clona pra rodar as duas versões sem uma afetar a outra
+        BufferedImage imagemParaPilha = manipulador.clonar(imagemOriginal);
+        BufferedImage imagemParaFila = manipulador.clonar(imagemOriginal);
 
-    public FloodFillFila(ManipuladorImagem manipulador) {
-        this.manipulador = manipulador;
+        int corNova = 0xFF9C27B0; // roxo, exemplo do PDF
+
+        FloodFillPilha floodPilha = new FloodFillPilha(manipulador);
+        List<BufferedImage> framesPilha = floodPilha.executar(imagemParaPilha, 0, 0, corNova);
+
+        FloodFillFila floodFila = new FloodFillFila(manipulador);
+        List<BufferedImage> framesFila = floodFila.executar(imagemParaFila, 0, 0, corNova);
+
+        manipulador.salvar(imagemParaPilha, "saida_pilha.png");
+        manipulador.salvar(imagemParaFila, "saida_fila.png");
+
+        exibirAnimacao(framesPilha);
     }
 
-    public List<BufferedImage> executar(BufferedImage imagem, int xInicial, int yInicial, int novaCor) {
-        List<BufferedImage> frames = new ArrayList<>();
+    private static void exibirAnimacao(List<BufferedImage> frames) {
+        JFrame janela = new JFrame("Flood Fill - Animação");
+        JLabel label = new JLabel();
+        janela.add(label);
+        janela.setSize(600, 600);
+        janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        janela.setVisible(true);
 
-        int corFundo = imagem.getRGB(xInicial, yInicial);
-        if (corFundo == novaCor) return frames;
-
-        MinhaFila<Ponto> fila = new MinhaFila<>(imagem.getWidth() * imagem.getHeight());
-        fila.enfileirar(new Ponto(xInicial, yInicial));
-
-        int contador = 0;
-        int intervaloFrame = 1;
-
-        while (!fila.vazia()) {
-            Ponto p = fila.desenfileirar();
-            int x = p.getX();
-            int y = p.getY();
-
-            if (!manipulador.dentroDosLimites(imagem, x, y)) continue;
-            if (imagem.getRGB(x, y) != corFundo) continue;
-
-            imagem.setRGB(x, y, novaCor);
-
-            contador++;
-            if (contador % intervaloFrame == 0) {
-                frames.add(manipulador.clonar(imagem));
+        new Timer(50, e -> {
+            for (BufferedImage frame : frames) {
+                label.setIcon(new ImageIcon(
+                    frame.getScaledInstance(500, 500, Image.SCALE_FAST)
+                ));
+                label.repaint();
+                try { Thread.sleep(50); } catch (InterruptedException ignored) {}
             }
-
-            fila.enfileirar(new Ponto(x + 1, y));
-            fila.enfileirar(new Ponto(x - 1, y));
-            fila.enfileirar(new Ponto(x, y + 1));
-            fila.enfileirar(new Ponto(x, y - 1));
-        }
-
-        frames.add(manipulador.clonar(imagem));
-        return frames;
+        }).start();
     }
 }
