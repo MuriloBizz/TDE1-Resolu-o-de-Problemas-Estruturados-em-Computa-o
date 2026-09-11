@@ -1,16 +1,21 @@
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import javax.imageio.ImageIO;
 
 public class ManipuladorImagem {
 
     public String obterCaminhoBase() throws URISyntaxException {
-        File pastaAtual = new File(
+        File localizacao = new File(
             getClass().getProtectionDomain().getCodeSource().getLocation().toURI()
         );
-        return pastaAtual.getParent();
+
+        if (localizacao.isDirectory()) {
+            return localizacao.getPath();
+        } else {
+            return localizacao.getParent();
+        }
     }
 
     public BufferedImage carregar(String caminho) throws IOException {
@@ -33,7 +38,4 @@ public class ManipuladorImagem {
         return copia;
     }
 
-    public boolean dentroDosLimites(BufferedImage imagem, int x, int y) {
-        return x >= 0 && x < imagem.getWidth() && y >= 0 && y < imagem.getHeight();
-    }
 }

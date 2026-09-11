@@ -16,18 +16,19 @@ public class FloodFillPilha {
         int corFundo = imagem.getRGB(xInicial, yInicial);
         if (corFundo == novaCor) return frames;
 
-        MinhaPilha<Ponto> pilha = new MinhaPilha<>(16); // capacidade inicial pequena, cresce sozinha
-        pilha.empilhar(new Ponto(xInicial, yInicial));
+        Pilha pilha = new Pilha(16);
+        pilha.empilhar(new Coordenada(xInicial, yInicial));
 
         int contador = 0;
-        int intervaloFrame = 1;
+        int totalPixels = imagem.getWidth() * imagem.getHeight();
+        int intervaloFrame = Math.max(1, totalPixels / 200);
 
-        while (!pilha.vazia()) {
-            Ponto p = pilha.desempilhar();
-            int x = p.getX();
-            int y = p.getY();
+        while (pilha.topo != -1) {
+            Coordenada c = pilha.desempilhar();
+            int x = c.getX();
+            int y = c.getY();
 
-            if (!manipulador.dentroDosLimites(imagem, x, y)) continue;
+            if (x < 0 || x >= imagem.getWidth() || y < 0 || y >= imagem.getHeight()) continue;
             if (imagem.getRGB(x, y) != corFundo) continue;
 
             imagem.setRGB(x, y, novaCor);
@@ -37,10 +38,10 @@ public class FloodFillPilha {
                 frames.add(manipulador.clonar(imagem));
             }
 
-            pilha.empilhar(new Ponto(x + 1, y));
-            pilha.empilhar(new Ponto(x - 1, y));
-            pilha.empilhar(new Ponto(x, y + 1));
-            pilha.empilhar(new Ponto(x, y - 1));
+            pilha.empilhar(new Coordenada(x + 1, y));
+            pilha.empilhar(new Coordenada(x - 1, y));
+            pilha.empilhar(new Coordenada(x, y + 1));
+            pilha.empilhar(new Coordenada(x, y - 1));
         }
 
         frames.add(manipulador.clonar(imagem));

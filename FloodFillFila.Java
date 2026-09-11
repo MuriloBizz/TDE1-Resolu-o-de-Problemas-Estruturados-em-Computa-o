@@ -16,18 +16,20 @@ public class FloodFillFila {
         int corFundo = imagem.getRGB(xInicial, yInicial);
         if (corFundo == novaCor) return frames;
 
-        MinhaFila<Ponto> fila = new MinhaFila<>(16); // capacidade inicial pequena, cresce sozinha
-        fila.enfileirar(new Ponto(xInicial, yInicial));
+        Fila fila = new Fila(16);
+        fila.enfileirar(new Coordenada(xInicial, yInicial));
 
         int contador = 0;
-        int intervaloFrame = 1;
 
-        while (!fila.vazia()) {
-            Ponto p = fila.desenfileirar();
-            int x = p.getX();
-            int y = p.getY();
+        int totalPixels = imagem.getWidth() * imagem.getHeight();
+        int intervaloFrame = Math.max(1, totalPixels / 200);
 
-            if (!manipulador.dentroDosLimites(imagem, x, y)) continue;
+        while (fila.tamanho != 0){
+            Coordenada c = fila.desenfileirar();
+            int x = c.getX();
+            int y = c.getY();
+
+            if (x < 0 || x >= imagem.getWidth() || y < 0 || y >= imagem.getHeight()) continue;
             if (imagem.getRGB(x, y) != corFundo) continue;
 
             imagem.setRGB(x, y, novaCor);
@@ -37,13 +39,13 @@ public class FloodFillFila {
                 frames.add(manipulador.clonar(imagem));
             }
 
-            fila.enfileirar(new Ponto(x + 1, y));
-            fila.enfileirar(new Ponto(x - 1, y));
-            fila.enfileirar(new Ponto(x, y + 1));
-            fila.enfileirar(new Ponto(x, y - 1));
+            fila.enfileirar(new Coordenada(x + 1, y));
+            fila.enfileirar(new Coordenada(x - 1, y));
+            fila.enfileirar(new Coordenada(x, y + 1));
+            fila.enfileirar(new Coordenada(x, y - 1));
         }
 
-        frames.add(manipulador.clonar(imagem));
+        frames.add(manipulador.clonar(imagem)); 
         return frames;
     }
 }
