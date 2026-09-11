@@ -2,8 +2,16 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class ManipuladorImagem {
+
+    public String obterCaminhoBase() throws URISyntaxException {
+        File pastaAtual = new File(
+            getClass().getProtectionDomain().getCodeSource().getLocation().toURI()
+        );
+        return pastaAtual.getParent();
+    }
 
     public BufferedImage carregar(String caminho) throws IOException {
         return ImageIO.read(new File(caminho));

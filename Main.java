@@ -1,4 +1,5 @@
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
@@ -6,11 +7,12 @@ import java.awt.*;
 public class Main {
     public static void main(String[] args) throws Exception {
         ManipuladorImagem manipulador = new ManipuladorImagem();
-        BufferedImage imagemOriginal = manipulador.carregar("entrada.png");
 
-        // clona pra rodar as duas versões sem uma afetar a outra
-        BufferedImage imagemParaPilha = manipulador.clonar(imagemOriginal);
-        BufferedImage imagemParaFila = manipulador.clonar(imagemOriginal);
+        String base = manipulador.obterCaminhoBase();
+        BufferedImage imagem = manipulador.carregar(base + File.separator + "entrada_binarizada.png");
+
+        BufferedImage imagemParaPilha = manipulador.clonar(imagem);
+        BufferedImage imagemParaFila = manipulador.clonar(imagem);
 
         int corNova = 0xFF9C27B0; // roxo, exemplo do PDF
 
@@ -20,8 +22,8 @@ public class Main {
         FloodFillFila floodFila = new FloodFillFila(manipulador);
         List<BufferedImage> framesFila = floodFila.executar(imagemParaFila, 0, 0, corNova);
 
-        manipulador.salvar(imagemParaPilha, "saida_pilha.png");
-        manipulador.salvar(imagemParaFila, "saida_fila.png");
+        manipulador.salvar(imagemParaPilha, base + File.separator + "saida_pilha.png");
+        manipulador.salvar(imagemParaFila, base + File.separator + "saida_fila.png");
 
         exibirAnimacao(framesPilha);
     }
@@ -34,14 +36,19 @@ public class Main {
         janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         janela.setVisible(true);
 
-        new Timer(50, e -> {
-            for (BufferedImage frame : frames) {
-                label.setIcon(new ImageIcon(
-                    frame.getScaledInstance(500, 500, Image.SCALE_FAST)
-                ));
-                label.repaint();
-                try { Thread.sleep(50); } catch (InterruptedException ignored) {}
+        int[] indice = {0};
+
+        Timer timer = new Timer(50, null);
+        timer.addActionListener(e -> {
+            if (indice[0] >= frames.size()) {
+                timer.stop();
+                return;
             }
-        }).start();
+            BufferedImage frame = frames.get(indice[0]);
+            label.setIcon(new ImageIcon(frame.getScaledInstance(500, 500, Image.SCALE_FAST)));
+            label.repaint();
+            indice[0]++;
+        });
+        timer.start();
     }
 }

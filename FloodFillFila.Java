@@ -16,7 +16,7 @@ public class FloodFillFila {
         int corFundo = imagem.getRGB(xInicial, yInicial);
         if (corFundo == novaCor) return frames;
 
-        MinhaFila<Ponto> fila = new MinhaFila<>(imagem.getWidth() * imagem.getHeight());
+        MinhaFila<Ponto> fila = new MinhaFila<>(16); // capacidade inicial pequena, cresce sozinha
         fila.enfileirar(new Ponto(xInicial, yInicial));
 
         int contador = 0;

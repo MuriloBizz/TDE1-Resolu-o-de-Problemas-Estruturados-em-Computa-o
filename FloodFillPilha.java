@@ -14,13 +14,13 @@ public class FloodFillPilha {
         List<BufferedImage> frames = new ArrayList<>();
 
         int corFundo = imagem.getRGB(xInicial, yInicial);
-        if (corFundo == novaCor) return frames; // nada a fazer
+        if (corFundo == novaCor) return frames;
 
-        MinhaPilha<Ponto> pilha = new MinhaPilha<>(imagem.getWidth() * imagem.getHeight());
+        MinhaPilha<Ponto> pilha = new MinhaPilha<>(16); // capacidade inicial pequena, cresce sozinha
         pilha.empilhar(new Ponto(xInicial, yInicial));
 
         int contador = 0;
-        int intervaloFrame = 1; // aumente esse valor se a imagem for grande
+        int intervaloFrame = 1;
 
         while (!pilha.vazia()) {
             Ponto p = pilha.desempilhar();
@@ -43,7 +43,7 @@ public class FloodFillPilha {
             pilha.empilhar(new Ponto(x, y - 1));
         }
 
-        frames.add(manipulador.clonar(imagem)); // frame final
+        frames.add(manipulador.clonar(imagem));
         return frames;
     }
 }
