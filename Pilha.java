@@ -19,7 +19,7 @@ public class Pilha {
             throw new IllegalStateException("Pilha vazia");
         }
         Coordenada elemento = elementos[topo];
-        elementos[topo--] = null; 
+        elementos[topo] = null; 
         topo--;
         return elemento;
     }
